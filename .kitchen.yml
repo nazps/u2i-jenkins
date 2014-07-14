@@ -1,0 +1,42 @@
+---
+driver:
+  name: vagrant
+driver_config:
+  forward_agent: true
+  customize:
+    memory: 2048
+    cpus: 4
+  network:
+    - ["forwarded_port", {guest: 8080, host: 8080}] # forward Jenkins
+    - ["forwarded_port", {guest: 8889, host: 8889}] # forward Chef-Zero
+
+provisioner:
+  name: chef_zero
+  require_chef_omnibus: true
+  data_bags_path: ./test/integration/data_bags
+  encrypted_data_bag_secret_key_path: ./test/integration/default/encrypted_data_bag_secret
+
+platforms:
+  - name: ubuntu-14.04
+
+suites:
+  - name: default
+    run_list:
+      - recipe[u2i-jenkins]
+    attributes:
+      rvm:
+        group_users:
+          - jenkins
+          - vagrant
+      jenkins:
+        master:
+          port: 8080
+      u2i-jenkins:
+        config:
+          git_name: Jenkins
+          email: jenkins@u2i.com
+          admins:
+            - michal.knapik@u2i.com
+          domain: localhost
+          address: localhost
+          plugins:

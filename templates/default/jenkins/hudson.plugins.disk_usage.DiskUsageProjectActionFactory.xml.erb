@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson.plugins.disk__usage.DiskUsageProjectActionFactory_-DescriptorImpl plugin="disk-usage@0.23">
+  <countIntervalBuilds>0 */6 * * *</countIntervalBuilds>
+  <calculationBuilds>true</calculationBuilds>
+  <countIntervalJobs>0 */6 * * *</countIntervalJobs>
+  <calculationJobs>true</calculationJobs>
+  <countIntervalWorkspace>0 */6 * * *</countIntervalWorkspace>
+  <calculationWorkspace>true</calculationWorkspace>
+  <checkWorkspaceOnSlave>false</checkWorkspaceOnSlave>
+  <email><%= node['u2i-jenkins']['config']['plugins']['disk-usage']['email'] -%></email>
+  <jobWorkspaceExceedSize>
+    <%= node['u2i-jenkins']['config']['plugins']['disk-usage']['jobWorkspaceExceedSize'] -%>
+  </jobWorkspaceExceedSize>
+  <showFreeSpaceForJobDirectory>true</showFreeSpaceForJobDirectory>
+  <diskUsageBuilds>0</diskUsageBuilds>
+  <diskUsageJobsWithoutBuilds>0</diskUsageJobsWithoutBuilds>
+  <diskUsageWorkspaces>0</diskUsageWorkspaces>
+  <diskUsageLockedBuilds>0</diskUsageLockedBuilds>
+  <showGraph>false</showGraph>
+  <historyLength>183</historyLength>
+  <history class="hudson.plugins.disk_usage.DiskUsageProjectActionFactory$DescriptorImpl$1" serialization="custom"/>
+  <timeoutWorkspace>5</timeoutWorkspace>
+</hudson.plugins.disk__usage.DiskUsageProjectActionFactory_-DescriptorImpl>

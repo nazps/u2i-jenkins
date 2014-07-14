@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson.plugins.emailext.ExtendedEmailPublisherDescriptor plugin="email-ext@2.37.2.2">
+  <adminAddress><%= node['u2i-jenkins']['config']['email'] %></adminAddress>
+  <useSsl>false</useSsl>
+  <defaultContentType>text/html</defaultContentType>
+  <defaultSubject>$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!</defaultSubject>
+  <defaultBody>&lt;a href=&quot;${PROJECT_URL}&quot;&gt;$PROJECT_NAME&lt;/a&gt; - Build &lt;a href=&quot;${BUILD_URL}&quot;&gt;# $BUILD_NUMBER&lt;/a&gt; - $BUILD_STATUS:&#xd;
+&lt;br/&gt;&lt;br/&gt;&#xd;
+Check console output at $BUILD_URL to view the results.&#xd;
+&lt;br/&gt;&lt;br/&gt;&#xd;
+${GIT_BRANCH} - ${GIT_REVISION}&#xd;
+&lt;br/&gt;&#xd;
+&lt;br/&gt;&#xd;
+${TEST_COUNTS,var=&quot;fail&quot;} tests failed!&#xd;
+&lt;br/&gt;&#xd;
+&lt;br/&gt;&#xd;
+${CHANGES, showPaths=true,format=&quot;[%a] %m\&lt;br/\&gt;\\n&quot;}</defaultBody>
+  <defaultPresendScript></defaultPresendScript>
+  <maxAttachmentSize>-1</maxAttachmentSize>
+  <recipientList></recipientList>
+  <defaultReplyTo></defaultReplyTo>
+  <excludedCommitters></excludedCommitters>
+  <overrideGlobalSettings>false</overrideGlobalSettings>
+  <precedenceBulk>false</precedenceBulk>
+  <debugMode>false</debugMode>
+  <enableSecurity>false</enableSecurity>
+  <enableWatching>false</enableWatching>
+</hudson.plugins.emailext.ExtendedEmailPublisherDescriptor>
