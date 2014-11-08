@@ -5,7 +5,7 @@
    repository_path =  "#{@repository['organisation']}/#{@repository['name']}"
 %>
 <?xml version='1.0' encoding='UTF-8'?>
-<project>
+<matrix-project>
   <actions/>
   <description></description>
   <logRotator class="hudson.tasks.LogRotator">
@@ -19,7 +19,6 @@
     <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.8">
       <projectUrl>https://github.com/<%= repository_path -%>/</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@0.23"/>
     <% if is_pull_request %>
       <hudson.model.ParametersDefinitionProperty>
         <parameterDefinitions>
@@ -53,13 +52,7 @@
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <submoduleCfg class="list"/>
-    <extensions>
-      <hudson.plugins.git.extensions.impl.SubmoduleOption>
-        <disableSubmodules>false</disableSubmodules>
-        <recursiveSubmodules>true</recursiveSubmodules>
-        <trackingSubmodules>false</trackingSubmodules>
-      </hudson.plugins.git.extensions.impl.SubmoduleOption>
-    </extensions>
+    <extensions/>
   </scm>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
@@ -69,7 +62,7 @@
     <% if is_pull_request %>
       <org.jenkinsci.plugins.ghprb.GhprbTrigger plugin="ghprb@1.11.2">
         <spec>*/5 * * * *</spec>
-        <adminlist>mknapik</adminlist>
+        <adminlist><%= @admins %></adminlist>
         <whitelist></whitelist>
         <orgslist>u2i</orgslist>
         <cron>*/5 * * * *</cron>
@@ -94,40 +87,40 @@
     <% end %>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
+  <axes>
+  <% @matrix_axes.each do |axis, values| %>
+    <hudson.matrix.TextAxis>
+      <name><%= axis -%></name>
+      <values>
+      <% values.each do |value| %>
+        <string><%= value -%></string>
+      <% end %>
+      </values>
+    </hudson.matrix.TextAxis>
+  <% end %>
+  </axes>
+  <combinationFilter><%= @combination_filter %></combinationFilter>
   <builders>
     <hudson.tasks.Shell>
-      <command>#!/bin/bash
-cp /var/proj/nttr/config/*.yml config/
-cp /var/proj/nttr/config/<%= @branch %>/*.yml config/
+      <command>
+rm -f Gemfile.lock
+bundle &gt; .bundle.install
       </command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>#!/bin/bash
-bundle > .bundle.install
-
-bundle exec rake db:drop:all
-bundle exec rake db:create:all
-bundle exec rake db:migrate
-bundle exec rake db:test:prepare
-
-COVERAGE=1 bundle exec rake ci:setup:rspec spec
-</command>
+      <command>
+bundle exec rake ci:setup:rspec spec
+      </command>
     </hudson.tasks.Shell>
-    <% if @rubocop_metrics['enabled'] %>
-      <hudson.tasks.Shell>
-        <command>#!/bin/bash
-echo "Generate Rubocop metrics"
-
-mkdir -p tmp
-bundle exec rubocop --require rubocop/formatter/checkstyle_formatter --format RuboCop::Formatter::CheckstyleFormatter --no-color --out tmp/checkstyle.xml
-exit 0
-  </command>
-      </hudson.tasks.Shell>
-    <% end %>
     <hudson.tasks.Shell>
-      <command>#!/bin/bash
-bundle exec rake db:drop:all
-</command>
+      <command>
+if [ ${RUBY_VERSION} &gt; &quot;1.8&quot; ]; then
+  echo &quot;Generate Rubocop metrics&quot;
+
+  mkdir -p tmp
+  bundle exec rubocop --fail-level error --require rubocop/formatter/checkstyle_formatter --format RuboCop::Formatter::CheckstyleFormatter --no-color --out tmp/checkstyle.xml
+fi;
+      </command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
@@ -146,7 +139,7 @@ bundle exec rake db:drop:all
       </htmlpublisher.HtmlPublisher>
     <% end %>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>spec/reports/*.xml</testResults>
+      <testResults>spec/reports/*.xml,test/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
@@ -174,55 +167,39 @@ bundle exec rake db:drop:all
         </config>
       </hudson.plugins.violations.ViolationsPublisher>
     <% end %>
-    <% if @rcov_report %>
-      <hudson.plugins.rubyMetrics.rcov.RcovPublisher plugin="rubyMetrics@1.5.0">
-        <reportDir>coverage/rcov/</reportDir>
-        <targets>
-          <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
-            <metric>TOTAL_COVERAGE</metric>
-            <healthy>80</healthy>
-            <unhealthy>0</unhealthy>
-            <unstable>0</unstable>
-          </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
-          <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
-            <metric>CODE_COVERAGE</metric>
-            <healthy>80</healthy>
-            <unhealthy>70</unhealthy>
-            <unstable>50</unstable>
-          </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
-        </targets>
-      </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-    <% end %>
-    <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.37.2.2">
-      <recipientList>$DEFAULT_RECIPIENTS</recipientList>
-      <configuredTriggers>
-        <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
-          <email>
-            <recipientList></recipientList>
-            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
-            <body>$PROJECT_DEFAULT_CONTENT</body>
-            <sendToDevelopers>true</sendToDevelopers>
-            <sendToRequester>true</sendToRequester>
-            <includeCulprits>true</includeCulprits>
-            <sendToRecipientList>false</sendToRecipientList>
-            <attachmentsPattern></attachmentsPattern>
-            <attachBuildLog>false</attachBuildLog>
-            <compressBuildLog>false</compressBuildLog>
-            <replyTo>$PROJECT_DEFAULT_REPLYTO</replyTo>
-            <contentType>project</contentType>
-          </email>
-        </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
-      </configuredTriggers>
-      <contentType>default</contentType>
-      <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
-      <defaultContent>$DEFAULT_CONTENT</defaultContent>
-      <attachmentsPattern></attachmentsPattern>
-      <presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>
-      <attachBuildLog>false</attachBuildLog>
-      <compressBuildLog>false</compressBuildLog>
-      <replyTo>$DEFAULT_REPLYTO</replyTo>
-      <saveOutput>false</saveOutput>
-    </hudson.plugins.emailext.ExtendedEmailPublisher>
+    <% unless is_pull_request %>
+      <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.37.2.2">
+        <recipientList>$DEFAULT_RECIPIENTS</recipientList>
+        <configuredTriggers>
+          <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+            <email>
+              <recipientList></recipientList>
+              <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+              <body>$PROJECT_DEFAULT_CONTENT</body>
+              <sendToDevelopers>true</sendToDevelopers>
+              <sendToRequester>true</sendToRequester>
+              <includeCulprits>true</includeCulprits>
+              <sendToRecipientList>false</sendToRecipientList>
+              <attachmentsPattern></attachmentsPattern>
+              <attachBuildLog>false</attachBuildLog>
+              <compressBuildLog>false</compressBuildLog>
+              <replyTo>$PROJECT_DEFAULT_REPLYTO</replyTo>
+              <contentType>project</contentType>
+            </email>
+          </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+        </configuredTriggers>
+        <contentType>default</contentType>
+        <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+        <defaultContent>$DEFAULT_CONTENT</defaultContent>
+        <attachmentsPattern></attachmentsPattern>
+        <presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>
+        <attachBuildLog>false</attachBuildLog>
+        <compressBuildLog>false</compressBuildLog>
+        <replyTo>$DEFAULT_REPLYTO</replyTo>
+        <saveOutput>false</saveOutput>
+        <matrixTriggerMode>ONLY_PARENT</matrixTriggerMode>
+      </hudson.plugins.emailext.ExtendedEmailPublisher>
+  <% end %>
   </publishers>
   <buildWrappers>
     <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.23">
@@ -232,8 +209,9 @@ bundle exec rake db:drop:all
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
     <EnvInjectBuildWrapper plugin="envinject@1.90">
       <info>
-        <propertiesContent>RUBY_VERSION=<%= @ruby_version -%>
-RUBY_GEMSET=<%= @ruby_gemset -%></propertiesContent>
+        <propertiesContent>
+RUBY_GEMSET=<%= @ruby_gemset %>
+        </propertiesContent>
         <loadFilesFromMaster>false</loadFilesFromMaster>
       </info>
     </EnvInjectBuildWrapper>
@@ -251,4 +229,4 @@ RUBY_GEMSET=<%= @ruby_gemset -%></propertiesContent>
       </com.cloudbees.jenkins.plugins.sshagent.SSHAgentBuildWrapper>
     <% end %>
   </buildWrappers>
-</project>
+</matrix-project>

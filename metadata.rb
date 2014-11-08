@@ -10,5 +10,8 @@ depends 'java'
 depends 'jenkins'
 depends 'rvm'
 depends 'database'
+depends 'mysql'
+depends 'ssh_known_hosts'
+depends 'apt'
 
 supports 'ubuntu'

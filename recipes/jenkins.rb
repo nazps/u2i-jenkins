@@ -2,9 +2,20 @@ home = node['jenkins']['master']['home']
 
 include_recipe 'apt'
 
-include_recipe 'java::default'
+if node['jenkins']['master']['install_method'] == 'war'
+  include_recipe 'java::default'
+end
+
 include_recipe 'jenkins::master'
 include_recipe 'u2i-jenkins::_plugins'
+
+group 'rvm' do
+  notifies :create, 'ruby_block[jenkins_service_restart_flag]', :immediately
+  members %w(jenkins)
+  append  true
+end
+
+ssh_known_hosts_entry 'github.com'
 
 ## Credentials
 
@@ -12,8 +23,8 @@ keys = Chef::EncryptedDataBagItem.load('keys', 'jenkins')
 
 keys['credentials'].each do |name, values|
   jenkins_private_key_credentials name do
-    id values['id'] if values.has_key?('id')
-    description values['description'] if values.has_key?('description')
+    id values['id'] if values.key?('id')
+    description values['description'] if values.key?('description')
     private_key values['private_key']
   end
 end
@@ -23,7 +34,6 @@ configs = %w(
   .gitconfig
   config.xml
   hudson.plugins.git.GitSCM.xml
-  hudson.tasks.Shell.xml
   hudson.plugins.git.GitTool.xml
   hudson.tasks.Mailer.xml
   jenkins.model.JenkinsLocationConfiguration.xml
@@ -45,12 +55,14 @@ template ghprb_config do
   source 'jenkins/org.jenkinsci.plugins.ghprb.GhprbTrigger.xml.erb'
   owner 'jenkins'
   group 'jenkins'
-  variables access_token: keys['GhprbTrigger']['accessToken'], admins: keys['GhprbTrigger']['admins'].join(', ')
+  variables access_token: keys['GhprbTrigger']['accessToken'],
+            admins: keys['GhprbTrigger']['admins'].join(', ')
 end
 
 template github_config do
   source 'jenkins/com.cloudbees.jenkins.GitHubPushTrigger.xml.erb'
   owner 'jenkins'
   group 'jenkins'
-  variables access_token: keys['GitHubPushTrigger']['accessToken'], admins: keys['GitHubPushTrigger']['admins'].join(', ')
+  variables access_token: keys['GitHubPushTrigger']['accessToken'],
+            admins: keys['GitHubPushTrigger']['admins'].join(', ')
 end

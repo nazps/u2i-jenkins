@@ -1,0 +1,35 @@
+
+Style/Documentation:
+  Enabled: false
+
+Style/WhileUntilModifier:
+  MaxLineLength: 120
+  Exclude:
+    - spec/**/*
+
+Style/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+  EnforcedStyleForEmptyBraces: no_space
+
+Style/MultilineBlockChain:
+  Enabled: true
+
+Style/DotPosition:
+  EnforcedStyle: trailing
+  Enabled: true
+
+Style/SingleLineMethods:
+  AllowIfMethodIsEmpty: false
+
+Style/NumericLiterals:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 120
+  Enabled: true
+  Exclude:
+    - spec/**/*
+
+Metrics/MethodLength:
+  CountComments: false  # count full line comments?
+  Max: 30

@@ -1,0 +1,13 @@
+inherit_from: .rubocop_u2i.yml
+
+AllCops:
+  Exclude:
+    - resources/job.rb
+
+
+Metrics/LineLength:
+  Max: 120
+
+Style/SingleSpaceBeforeFirstArg:
+  Exclude:
+    - metadata.rb

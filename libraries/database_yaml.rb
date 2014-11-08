@@ -2,6 +2,7 @@ def database_yaml(jobname, branch)
   common = {
     'host' => 'localhost',
     'username' => 'root',
+    'password' => node['mysql']['server_root_password'],
     'adapter' => 'mysql',
     'timeout' => 5000,
     'encoding' => 'utf8',

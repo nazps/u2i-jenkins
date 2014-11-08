@@ -13,6 +13,9 @@
   <clouds/>
   <slaves/>
   <quietPeriod>5</quietPeriod>
+  <% if node['u2i-jenkins']['config']['numExecutors'] %>
+    <numExecutors><%= node['u2i-jenkins']['config']['numExecutors'] %></numExecutors>
+  <% end %>
   <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
   <views>
     <hudson.model.AllView>
