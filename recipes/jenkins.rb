@@ -21,14 +21,6 @@ ssh_known_hosts_entry 'github.com'
 
 keys = Chef::EncryptedDataBagItem.load('keys', 'jenkins')
 
-keys['credentials'].each do |name, values|
-  jenkins_private_key_credentials name do
-    id values['id'] if values.key?('id')
-    description values['description'] if values.key?('description')
-    private_key values['private_key']
-  end
-end
-
 ## Configs
 configs = %w(
   .gitconfig
