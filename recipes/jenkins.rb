@@ -17,11 +17,8 @@ end
 
 ssh_known_hosts_entry 'github.com'
 
-## Credentials
-
-keys = Chef::EncryptedDataBagItem.load('keys', 'jenkins')
-
 ## Configs
+
 configs = %w(
   .gitconfig
   config.xml
@@ -40,6 +37,7 @@ configs.each do |config|
   end
 end
 
+keys = Chef::EncryptedDataBagItem.load('keys', 'jenkins')
 github_config = File.join(home, 'com.cloudbees.jenkins.GitHubPushTrigger.xml')
 ghprb_config = File.join(home, 'org.jenkinsci.plugins.ghprb.GhprbTrigger.xml')
 

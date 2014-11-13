@@ -53,6 +53,7 @@ suites:
             - master
             - pr
             matrix:
+              sequentially: true
               combination_filter: "!(RUBY_VERSION==&quot;1.8.7&quot; &amp;&amp; RAILS_VERSION==&quot;4&quot;)"
               axes:
                 RUBY_VERSION:
@@ -78,6 +79,7 @@ suites:
             - master
             - development
             - pr
+            ws_cleanup: true
             rubocop:
               min: 7
               max: 8

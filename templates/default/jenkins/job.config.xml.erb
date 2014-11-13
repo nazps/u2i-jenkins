@@ -296,11 +296,13 @@ bundle exec brakeman -o brakeman-output.tabs
     </hudson.plugins.emailext.ExtendedEmailPublisher>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.23">
-      <deleteDirs>false</deleteDirs>
-      <cleanupParameter></cleanupParameter>
-      <externalDelete></externalDelete>
-    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <% if @ws_cleanup %>
+      <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.23">
+        <deleteDirs>false</deleteDirs>
+        <cleanupParameter></cleanupParameter>
+        <externalDelete></externalDelete>
+      </hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <% end %>
     <EnvInjectBuildWrapper plugin="envinject@1.90">
       <info>
         <propertiesContent>
@@ -327,4 +329,11 @@ RUBY_GEMSET=<%= @ruby_gemset %>
       </com.cloudbees.jenkins.plugins.sshagent.SSHAgentBuildWrapper>
     <% end %>
   </buildWrappers>
+  <% if @type == :ruby_matrix %>
+    <% if @matrix['sequentially'] %>
+      <executionStrategy class="hudson.matrix.DefaultMatrixExecutionStrategyImpl">
+        <runSequentially>true</runSequentially>
+      </executionStrategy>
+    <% end %>
+  <% end %>
 </<%= @type_tag -%>>

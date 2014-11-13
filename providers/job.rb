@@ -88,6 +88,7 @@ def create_job(branch)
 
               type: new_resource.type,
               matrix: new_resource.matrix,
+              ws_cleanup: new_resource.ws_cleanup,
               keep_builds: new_resource.keep_builds,
 
               git_recursive: new_resource.git_recursive,
@@ -97,6 +98,7 @@ def create_job(branch)
 
               coverage: new_resource.coverage,
 
+              rubocop: new_resource.rubocop,
               metric_fu: new_resource.metric_fu,
               brakeman_report: new_resource.brakeman,
               rails_report: new_resource.rails,

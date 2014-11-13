@@ -9,6 +9,7 @@ node['u2i-jenkins']['jobs'].each do |jobname, config|
 
       type config['type'].to_sym if config['type']
       matrix config['matrix'] if [:ruby_matrix, 'ruby_matrix'].include? config['type']
+      ws_cleanup config['ws_cleanup'] if config['ws_cleanup']
       keep_builds config['keep_builds'] if config['keep_builds']
 
       git_recursive config['git_recursive'] if config['git_recursive']
