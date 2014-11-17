@@ -10,7 +10,7 @@ include_recipe 'jenkins::master'
 include_recipe 'u2i-jenkins::_plugins'
 
 group 'rvm' do
-  notifies :create, 'ruby_block[jenkins_service_restart_flag]', :immediately
+  notifies :create, 'ruby_block[jenkins_service_restart_flag]', :delayed
   members %w(jenkins)
   append  true
 end

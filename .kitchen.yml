@@ -26,6 +26,8 @@ suites:
   - name: default
     run_list:
       - recipe[u2i-jenkins]
+      - recipe[u2i-jenkins::auth]
+      - recipe[u2i-jenkins::jobs]
     attributes:
       jenkins:
         executor:
