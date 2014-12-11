@@ -1,33 +1,40 @@
 node['u2i-jenkins']['jobs'].each do |jobname, config|
   if config['recipe'].nil?
     keys = Chef::EncryptedDataBagItem.load('keys', 'jenkins')
+    credential_name = config['credential_name'] || jobname
 
     u2i_jenkins_job jobname do
       repository config['repository']
       branch config['branches']
       builders config['builders']
 
-      type config['type'].to_sym if config['type']
-      matrix config['matrix'] if [:ruby_matrix, 'ruby_matrix'].include? config['type']
-      ws_cleanup config['ws_cleanup'] if config['ws_cleanup']
-      keep_builds config['keep_builds'] if config['keep_builds']
+      description config['description'] unless config['description'].blank?
 
-      git_recursive config['git_recursive'] if config['git_recursive']
+      concurrent_build config['concurrent_build'] unless config['concurrent_build'].nil?
+      type config['type'].to_sym if config['type']
+      lang config['lang'].to_sym if config['lang']
+      matrix config['matrix'] if [:matrix, 'matrix'].include? config['type']
+      ws_cleanup config['ws_cleanup'] unless config['ws_cleanup'].nil?
+      keep_builds config['keep_builds'] unless config['keep_builds'].nil?
+
+      git_recursive config['git_recursive'] unless config['git_recursive'].nil?
 
       ruby_version config['ruby_version'] if config['ruby_version']
       ruby_gemset config['ruby_gemset'] if config['ruby_gemset']
 
       coverage config['coverage'] if config['coverage']
 
-      rubocop config['rubocop'] if config['rubocop']
-      metric_fu config['metric_fu'] if config['metric_fu']
-      brakeman config['brakeman'] if config['brakeman']
-      rails config['rails'] if config['rails']
+      rubocop config['rubocop'] unless config['rubocop'].nil?
+      metric_fu config['metric_fu'] unless config['metric_fu'].nil?
+      brakeman config['brakeman'] unless config['brakeman'].nil?
+      rails config['rails'] unless config['rails'].nil?
+      rails_adapter config['rails_adapter'] unless config['rails_adapter']
+      custom_db config['custom_db'] unless config['custom_db'].nil?
 
-      key keys['credentials'][config['credential_name'] || jobname]['private_key'] if config['credential_name']
+      env_inject config['env_inject'] unless config['env_inject'].nil?
+
+      key({credential_name => keys['credentials'][credential_name]})
     end
-  else
-    include_recipe config['recipe']
   end
 end
 

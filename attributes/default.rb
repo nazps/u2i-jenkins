@@ -3,6 +3,8 @@ override['jenkins']['master']['port'] = 8080
 default['u2i-jenkins']['projects_dir'] = '/var/proj'
 default['mysql']['server_root_password'] = 'jenkins'
 
+default['u2i-jenkins']['jobs'] = {}
+
 default['u2i-jenkins']['config']['views'] = {
   'listView' => {
     'master' => {
@@ -52,7 +54,31 @@ default['u2i-jenkins']['config']['plugins']['rubocop']['default'] = {
   'unstable' => 30
 }
 
+default['u2i-jenkins']['config']['plugins']['checkstyle']['default'] = {
+  'min' => 10,
+  'max' => 20,
+  'unstable' => 30
+}
+
+default['u2i-jenkins']['config']['plugins']['pmd']['default'] = {
+  'min' => 10,
+  'max' => 20,
+  'unstable' => 30
+}
+
+default['u2i-jenkins']['config']['plugins']['findbugs']['default'] = {
+  'min' => 10,
+  'max' => 20,
+  'unstable' => 30
+}
+
 default['u2i-jenkins']['config']['keep_builds']['default'] = {
   'days' => 60,
   'num' => 50
 }
+
+default['u2i-jenkins']['config']['plugins']['google-login']['clientId'] = ''
+default['u2i-jenkins']['config']['plugins']['google-login']['clientSecret'] = ''
+default['u2i-jenkins']['config']['plugins']['google-login']['domain'] = 'u2i.com'
+
+force_override['apache']['listen_ports'] = ['80']

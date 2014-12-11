@@ -1,0 +1,15 @@
+<VirtualHost *:80>
+  ServerName <%= node['u2i-jenkins']['config']['address'] %>
+  ServerAlias <%= node['u2i-jenkins']['config']['aliases'].join(' ') %>
+
+  ProxyPass         /  <%= "http://localhost:#{node['jenkins']['master']['port']}/" -%> nocanon
+  ProxyPassReverse  /  <%= "http://localhost:#{node['jenkins']['master']['port']}/" %>
+  ProxyRequests     Off
+  AllowEncodedSlashes NoDecode
+
+  # Local reverse proxy authorization override
+  # Most unix distribution deny proxy by default (ie /etc/apache2/mods-enabled/proxy.conf in Ubuntu)
+  <Proxy <%= "http://localhost:#{node['jenkins']['master']['port']}"-%>/*>
+    Require all granted
+  </Proxy>
+</VirtualHost>

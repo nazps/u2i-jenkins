@@ -14,7 +14,7 @@
   <slaves/>
   <quietPeriod>5</quietPeriod>
   <% if node['u2i-jenkins']['config']['numExecutors'] %>
-    <numExecutors><%= node['u2i-jenkins']['config']['numExecutors'] %></numExecutors>
+  <numExecutors><%= node['u2i-jenkins']['config']['numExecutors'] %></numExecutors>
   <% end %>
   <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
   <views>
@@ -26,75 +26,75 @@
       <properties class="hudson.model.View$PropertyList"/>
     </hudson.model.AllView>
     <% node['u2i-jenkins']['config']['views']['listView'].each do |view_name, view_config| %>
-      <listView>
-        <owner class="hudson" reference="../../.."/>
-        <name><%= view_name -%></name>
-        <filterExecutors>false</filterExecutors>
-        <filterQueue>false</filterQueue>
-        <properties class="hudson.model.View$PropertyList"/>
-        <jobNames>
-          <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        </jobNames>
-        <jobFilters/>
-        <columns>
-          <hudson.views.StatusColumn/>
-          <hudson.views.WeatherColumn/>
-          <hudson.views.JobColumn/>
-          <hudson.views.JobColumn/>
-          <hudson.views.LastSuccessColumn/>
-          <hudson.views.LastFailureColumn/>
-          <hudson.views.LastDurationColumn/>
-          <hudson.views.BuildButtonColumn/>
-        </columns>
-        <includeRegex><%= view_config['includeRegex'] -%></includeRegex>
-        <recurse>false</recurse>
-      </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name><%= view_name -%></name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex><%= view_config['includeRegex'] -%></includeRegex>
+      <recurse>false</recurse>
+    </listView>
     <% end %>
     <% node['u2i-jenkins']['config']['views']['CategorizedJobsView'].each do |view_name, view_config| %>
-      <org.jenkinsci.plugins.categorizedview.CategorizedJobsView plugin="categorized-view@1.8">
-        <owner class="hudson" reference="../../.."/>
-        <name><%= view_name -%></name>
-        <filterExecutors>false</filterExecutors>
-        <filterQueue>false</filterQueue>
-        <properties class="hudson.model.View$PropertyList"/>
-        <jobNames>
-        </jobNames>
-        <jobFilters/>
-        <columns>
-          <hudson.views.StatusColumn/>
-          <hudson.views.WeatherColumn/>
-          <org.jenkinsci.plugins.categorizedview.IndentedJobColumn/>
-          <hudson.views.LastSuccessColumn/>
-          <hudson.views.LastFailureColumn/>
-          <hudson.views.LastDurationColumn/>
-          <hudson.views.BuildButtonColumn/>
-        </columns>
-        <includeRegex><%= view_config['includeRegex'] -%></includeRegex>
-        <recurse>true</recurse>
-        <categorizationCriteria>
-          <% view_config['categorizationCriteria'].each do |category_config| %>
-            <org.jenkinsci.plugins.categorizedview.GroupingRule>
-              <groupRegex><%= category_config['groupRegex'] -%></groupRegex>
-              <namingRule><%= category_config['namingRule'] -%></namingRule>
-            </org.jenkinsci.plugins.categorizedview.GroupingRule>
-          <% end %>
-        </categorizationCriteria>
-      </org.jenkinsci.plugins.categorizedview.CategorizedJobsView>
+    <org.jenkinsci.plugins.categorizedview.CategorizedJobsView plugin="categorized-view@1.8">
+      <owner class="hudson" reference="../../.."/>
+      <name><%= view_name -%></name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <org.jenkinsci.plugins.categorizedview.IndentedJobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex><%= view_config['includeRegex'] -%></includeRegex>
+      <recurse>true</recurse>
+      <categorizationCriteria>
+        <% view_config['categorizationCriteria'].each do |category_config| %>
+          <org.jenkinsci.plugins.categorizedview.GroupingRule>
+            <groupRegex><%= category_config['groupRegex'] -%></groupRegex>
+            <namingRule><%= category_config['namingRule'] -%></namingRule>
+          </org.jenkinsci.plugins.categorizedview.GroupingRule>
+        <% end %>
+      </categorizationCriteria>
+    </org.jenkinsci.plugins.categorizedview.CategorizedJobsView>
     <% end %>
     <% node['u2i-jenkins']['config']['views']['BuildMonitorView'].each do |view_name, view_config| %>
-      <com.smartcodeltd.jenkinsci.plugins.buildmonitor.BuildMonitorView plugin="build-monitor-plugin@1.3+build.72">
-        <owner class="hudson" reference="../../.."/>
-        <name><%= view_name -%></name>
-        <filterExecutors>false</filterExecutors>
-        <filterQueue>false</filterQueue>
-        <properties class="hudson.model.View$PropertyList"/>
-        <jobNames></jobNames>
-        <jobFilters/>
-        <columns/>
-        <includeRegex><%= view_config['includeRegex'] -%></includeRegex>
-        <recurse>true</recurse>
-        <order class="com.smartcodeltd.jenkinsci.plugins.buildmonitor.order.ByName"/>
-      </com.smartcodeltd.jenkinsci.plugins.buildmonitor.BuildMonitorView>
+    <com.smartcodeltd.jenkinsci.plugins.buildmonitor.BuildMonitorView plugin="build-monitor-plugin@1.3+build.72">
+      <owner class="hudson" reference="../../.."/>
+      <name><%= view_name -%></name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames></jobNames>
+      <jobFilters/>
+      <columns/>
+      <includeRegex><%= view_config['includeRegex'] -%></includeRegex>
+      <recurse>true</recurse>
+      <order class="com.smartcodeltd.jenkinsci.plugins.buildmonitor.order.ByName"/>
+    </com.smartcodeltd.jenkinsci.plugins.buildmonitor.BuildMonitorView>
     <% end %>
   </views>
   <primaryView><%= node['u2i-jenkins']['config']['primaryView'] -%></primaryView>

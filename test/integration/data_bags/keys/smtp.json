@@ -1,0 +1,15 @@
+{
+  "id": "smtp",
+  "username": {
+    "encrypted_data": "IhEYqPxkGv4Uw4Cw2u146S3DDejKLYGh0mXCq0wq1/M=\n",
+    "iv": "28moDaR17hTgwGhwUN9iOA==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "password": {
+    "encrypted_data": "tKQ+Me9PpFcbeLO/LmyknaoImo7KwEY67IiwD0qvi9c=\n",
+    "iv": "mlhksjP2QrxR7y1lwicYow==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  }
+}

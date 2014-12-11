@@ -1,7 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <<%= @type_tag -%>>
   <actions/>
-  <description></description>
+  <description>
+    <%= @description %>
+  </description>
   <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep><%= @keep_builds[:days] -%></daysToKeep>
     <numToKeep><%= @keep_builds[:num] -%></numToKeep>
@@ -10,50 +12,50 @@
   </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.8">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.10">
       <projectUrl>https://github.com/<%= @repository -%>/</projectUrl>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
     <% if @is_pull_request %>
-      <hudson.model.ParametersDefinitionProperty>
-        <parameterDefinitions>
-          <hudson.model.StringParameterDefinition>
-            <name>sha1</name>
-            <description></description>
-            <defaultValue></defaultValue>
-          </hudson.model.StringParameterDefinition>
-        </parameterDefinitions>
-      </hudson.model.ParametersDefinitionProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>sha1</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
     <% end %>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.2.1">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.4">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <% if @is_pull_request %>
-          <refspec>+refs/pull/*:refs/remotes/origin/pr/*</refspec>
-        <% end %>
+      <% if @is_pull_request %>
+        <refspec>+refs/pull/*:refs/remotes/origin/pr/*</refspec>
+      <% end %>
         <url>git@github.com:<%= @repository -%>.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <% if @is_pull_request %>
-          <name>${sha1}</name>
-        <% else %>
-          <name><%= "*/#{@branch}" %></name>
-        <% end %>
+      <% if @is_pull_request %>
+        <name>${sha1}</name>
+      <% else %>
+        <name><%= "*/#{@branch}" %></name>
+      <% end %>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <submoduleCfg class="list"/>
     <% if @git_recursive %>
-      <extensions>
-        <hudson.plugins.git.extensions.impl.SubmoduleOption>
-          <disableSubmodules>false</disableSubmodules>
-          <recursiveSubmodules>true</recursiveSubmodules>
-          <trackingSubmodules>false</trackingSubmodules>
-        </hudson.plugins.git.extensions.impl.SubmoduleOption>
-      </extensions>
+    <extensions>
+      <hudson.plugins.git.extensions.impl.SubmoduleOption>
+        <disableSubmodules>false</disableSubmodules>
+        <recursiveSubmodules>true</recursiveSubmodules>
+        <trackingSubmodules>false</trackingSubmodules>
+      </hudson.plugins.git.extensions.impl.SubmoduleOption>
+    </extensions>
     <% end %>
   </scm>
   <canRoam>true</canRoam>
@@ -62,208 +64,314 @@
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
     <% if @is_pull_request %>
-      <org.jenkinsci.plugins.ghprb.GhprbTrigger plugin="ghprb@1.11.2">
-        <spec>*/5 * * * *</spec>
-        <adminlist><%= @admins %></adminlist>
-        <whitelist></whitelist>
-        <orgslist>u2i</orgslist>
-        <cron>*/5 * * * *</cron>
-        <triggerPhrase>[ci]</triggerPhrase>
-        <onlyTriggerPhrase>false</onlyTriggerPhrase>
-        <useGitHubHooks>true</useGitHubHooks>
-        <permitAll>false</permitAll>
-        <autoCloseFailedPullRequests>false</autoCloseFailedPullRequests>
-        <whiteListTargetBranches>
-          <org.jenkinsci.plugins.ghprb.GhprbBranch>
-            <branch></branch>
-          </org.jenkinsci.plugins.ghprb.GhprbBranch>
-        </whiteListTargetBranches>
-      </org.jenkinsci.plugins.ghprb.GhprbTrigger>
+    <org.jenkinsci.plugins.ghprb.GhprbTrigger plugin="ghprb@1.11.2">
+      <spec>*/5 * * * *</spec>
+      <adminlist><%= @admins %></adminlist>
+      <whitelist></whitelist>
+      <orgslist>u2i</orgslist>
+      <cron>*/5 * * * *</cron>
+      <triggerPhrase>[ci]</triggerPhrase>
+      <onlyTriggerPhrase>false</onlyTriggerPhrase>
+      <useGitHubHooks>true</useGitHubHooks>
+      <permitAll>false</permitAll>
+      <autoCloseFailedPullRequests>false</autoCloseFailedPullRequests>
+      <whiteListTargetBranches>
+        <org.jenkinsci.plugins.ghprb.GhprbBranch>
+          <branch></branch>
+        </org.jenkinsci.plugins.ghprb.GhprbBranch>
+      </whiteListTargetBranches>
+    </org.jenkinsci.plugins.ghprb.GhprbTrigger>
     <% else %>
-      <hudson.triggers.TimerTrigger>
-        <spec>H H * * *</spec>
-      </hudson.triggers.TimerTrigger>
-      <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.8">
-        <spec></spec>
-      </com.cloudbees.jenkins.GitHubPushTrigger>
+    <% if @timer_trigger %>
+    <hudson.triggers.TimerTrigger>
+      <spec><%= @timer_trigger -%></spec>
+    </hudson.triggers.TimerTrigger>
+    <% end %>
+    <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.8">
+      <spec></spec>
+    </com.cloudbees.jenkins.GitHubPushTrigger>
     <% end %>
   </triggers>
-  <concurrentBuild>false</concurrentBuild>
-  <% if @type == :ruby_matrix %>
-    <axes>
-    <% @matrix['axes'].each do |axis, values| %>
-      <hudson.matrix.TextAxis>
-        <name><%= axis -%></name>
-        <values>
-        <% values.each do |value| %>
-          <string><%= value -%></string>
-        <% end %>
-        </values>
-      </hudson.matrix.TextAxis>
-    <% end %>
-    </axes>
-    <combinationFilter><%= @matrix['combination_filter'] %></combinationFilter>
+  <concurrentBuild><%= @concurrent_build -%></concurrentBuild>
+  <% if @type_tag == 'matrix-project' %>
+  <axes>
+  <% @matrix['axes'].each do |axis, values| %>
+    <hudson.matrix.TextAxis>
+      <name><%= axis -%></name>
+      <values>
+      <% values.each do |value| %>
+        <string><%= value -%></string>
+      <% end %>
+      </values>
+    </hudson.matrix.TextAxis>
+  <% end %>
+  </axes>
+  <combinationFilter><%= @matrix['combination_filter'] %></combinationFilter>
   <% end %>
   <builders>
-    <% @builders.each do |builder| %>
-      <<%= builder['type'] -%>>
-        <command><%= builder['command'] -%></command>
-      </<%= builder['type'] -%>>
-    <% end %>
-    <% if @rubocop %>
-      <hudson.tasks.Shell>
-        <command>
-if [ ${RUBY_VERSION} &gt; &quot;1.8&quot; ]; then
+  <% @builders.each do |builder| %>
+<%= builder %>
+  <% end %>
+  <% if @lang == :ruby && @rubocop %>
+    <hudson.tasks.Shell>
+      <command>
+set +x
+source $RVM_HOME/scripts/rvm
+rvm use ${RUBY_VERSION}@${RUBY_GEMSET} --create --install
+export RUBY_VERSION_CURRENT=`rvm current`
+set -x
+
+if ! [[ &quot;$RUBY_VERSION_CURRENT&quot; &lt; &quot;ruby-1.9&quot; ]]; then
   echo &quot;Generate Rubocop metrics&quot;
   bundle exec rubocop --fail-level error --require rubocop/formatter/checkstyle_formatter --format RuboCop::Formatter::CheckstyleFormatter --no-color --out checkstyle.xml
 fi;
-        </command>
-      </hudson.tasks.Shell>
-    <% end %>
-    <% if @metric_fu_report %>
+      </command>
+    </hudson.tasks.Shell>
+  <% end %>
+  <% if @lang == :ruby && @metric_fu_report %>
     <hudson.tasks.Shell>
-        <command>
+      <command>
+set +x
+source $RVM_HOME/scripts/rvm
+rvm use ${RUBY_VERSION}@${RUBY_GEMSET} --create --install
+set -x
+
 echo "Run Metric Fu"
 bundle exec metric_fu
-        </command>
+      </command>
     </hudson.tasks.Shell>
-    <% end %>
-    <% if @brakeman_report %>
+  <% end %>
+  <% if @lang == :ruby && @brakeman_report %>
     <hudson.tasks.Shell>
-        <command>
+      <command>
+set +x
+source $RVM_HOME/scripts/rvm
+rvm use ${RUBY_VERSION}@${RUBY_GEMSET} --create --install
+set -x
+
 echo "Run brakeman"
 bundle exec brakeman -o brakeman-output.tabs
-        </command>
+      </command>
     </hudson.tasks.Shell>
-    <% end %>
+  <% end %>
   </builders>
   <publishers>
+  <% if @lang == :java && (@pmd || @findbugs || @checkstyle) %>
+    <hudson.plugins.postbuildtask.PostbuildTask plugin="postbuild-task@1.8">
+      <tasks>
+        <hudson.plugins.postbuildtask.TaskProperties>
+          <logTexts>
+            <hudson.plugins.postbuildtask.LogProperties>
+              <logText></logText>
+              <operator>AND</operator>
+            </hudson.plugins.postbuildtask.LogProperties>
+          </logTexts>
+          <EscalateStatus>false</EscalateStatus>
+          <RunIfJobSuccessful>false</RunIfJobSuccessful>
+          <script>
+set +e
+<% if @checkstyle %>
+./gradlew --continue checkstyleMain checkstyleTest&#xd;
+<% end %>
+<% if @pmd %>
+./gradlew --continue pmdMain pmdTest&#xd;
+<% end %>
+<% if @findbugs %>
+./gradlew --continue findbugsMain findbugsTest&#xd;
+<% end %>
+exit 0</script>
+        </hudson.plugins.postbuildtask.TaskProperties>
+      </tasks>
+    </hudson.plugins.postbuildtask.PostbuildTask>
+  <% end %>
+  <% if @lang == :ruby %>
     <hudson.tasks.junit.JUnitResultArchiver>
       <testResults>spec/reports/*.xml,test/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
-    <% if @brakeman_report %>
-      <hudson.plugins.brakeman.BrakemanPublisher plugin="brakeman@0.7">
-        <healthy></healthy>
-        <unHealthy></unHealthy>
-        <thresholdLimit>low</thresholdLimit>
-        <pluginName>[BRAKEMAN] </pluginName>
-        <defaultEncoding>UTF-8</defaultEncoding>
-        <canRunOnFailed>false</canRunOnFailed>
-        <useStableBuildAsReference>false</useStableBuildAsReference>
-        <useDeltaValues>false</useDeltaValues>
-        <thresholds plugin="analysis-core@1.65">
-          <unstableTotalAll></unstableTotalAll>
-          <unstableTotalHigh></unstableTotalHigh>
-          <unstableTotalNormal></unstableTotalNormal>
-          <unstableTotalLow></unstableTotalLow>
-          <failedTotalAll></failedTotalAll>
-          <failedTotalHigh></failedTotalHigh>
-          <failedTotalNormal></failedTotalNormal>
-          <failedTotalLow></failedTotalLow>
-        </thresholds>
-        <shouldDetectModules>false</shouldDetectModules>
-        <dontComputeNew>true</dontComputeNew>
-        <doNotResolveRelativePaths>false</doNotResolveRelativePaths>
-        <outputFile>brakeman-output.tabs</outputFile>
+  <% end %>
+  <% if @lang == :java %>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>build/test-results/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
+  <% end %>
+  <% if @lang == :ruby && @brakeman_report %>
+    <hudson.plugins.brakeman.BrakemanPublisher plugin="brakeman@0.7">
+      <healthy></healthy>
+      <unHealthy></unHealthy>
+      <thresholdLimit>low</thresholdLimit>
+      <pluginName>[BRAKEMAN] </pluginName>
+      <defaultEncoding>UTF-8</defaultEncoding>
+      <canRunOnFailed>false</canRunOnFailed>
+      <useStableBuildAsReference>false</useStableBuildAsReference>
+      <useDeltaValues>false</useDeltaValues>
+      <thresholds plugin="analysis-core@1.65">
+        <unstableTotalAll></unstableTotalAll>
+        <unstableTotalHigh></unstableTotalHigh>
+        <unstableTotalNormal></unstableTotalNormal>
+        <unstableTotalLow></unstableTotalLow>
+        <failedTotalAll></failedTotalAll>
+        <failedTotalHigh></failedTotalHigh>
+        <failedTotalNormal></failedTotalNormal>
+        <failedTotalLow></failedTotalLow>
+      </thresholds>
+      <shouldDetectModules>false</shouldDetectModules>
+      <dontComputeNew>true</dontComputeNew>
+      <doNotResolveRelativePaths>false</doNotResolveRelativePaths>
+      <outputFile>brakeman-output.tabs</outputFile>
       </hudson.plugins.brakeman.BrakemanPublisher>
-    <% end %>
-    <% if @metric_fu_report || @coverage %>
-      <htmlpublisher.HtmlPublisher plugin="htmlpublisher@1.3">
-        <reportTargets>
-          <% if @metric_fu_report %>
-            <htmlpublisher.HtmlPublisherTarget>
-              <reportName>Metric Fu Report</reportName>
-              <reportDir>tmp/metric_fu/output/</reportDir>
-              <reportFiles>index.html</reportFiles>
-              <keepAll>true</keepAll>
-              <allowMissing>true</allowMissing>
-              <wrapperName>htmlpublisher-wrapper.html</wrapperName>
-            </htmlpublisher.HtmlPublisherTarget>
-          <% end %>
-          <% if @coverage %>
-            <htmlpublisher.HtmlPublisherTarget>
-              <reportName>Simplecov Report</reportName>
-              <reportDir>coverage/</reportDir>
-              <reportFiles>index.html</reportFiles>
-              <keepAll>true</keepAll>
-              <allowMissing>true</allowMissing>
-              <wrapperName>htmlpublisher-wrapper.html</wrapperName>
-            </htmlpublisher.HtmlPublisherTarget>
-          <% end %>
-        </reportTargets>
-      </htmlpublisher.HtmlPublisher>
-    <% end %>
-    <% if @rubocop %>
-      <hudson.plugins.violations.ViolationsPublisher plugin="violations@0.7.11">
-        <config>
-          <suppressions class="sorted-set"/>
-          <typeConfigs>
-            <entry>
-              <string>checkstyle</string>
-              <hudson.plugins.violations.TypeConfig>
-                <type>checkstyle</type>
-                <min><%= @rubocop['min'] -%></min>
-                <max><%= @rubocop['max'] -%></max>
-                <unstable><%= @rubocop['unstable'] -%></unstable>
-                <usePattern>false</usePattern>
-                <pattern>checkstyle.xml</pattern>
-              </hudson.plugins.violations.TypeConfig>
-            </entry>
-          </typeConfigs>
-          <limit>100</limit>
-          <sourcePathPattern></sourcePathPattern>
-          <fauxProjectPath></fauxProjectPath>
-          <encoding>default</encoding>
-        </config>
-      </hudson.plugins.violations.ViolationsPublisher>
-    <% end %>
-    <% if @coverage %>
-      <hudson.plugins.rubyMetrics.rcov.RcovPublisher plugin="rubyMetrics@1.5.0">
-        <reportDir>coverage/rcov/</reportDir>
-        <targets>
-          <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
-            <metric>TOTAL_COVERAGE</metric>
-            <healthy><%= @coverage['total']['healthy'] %></healthy>
-            <unhealthy><%= @coverage['total']['unhealthy'] %></unhealthy>
-            <unstable><%= @coverage['total']['unstable'] %></unstable>
-          </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
-          <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
-            <metric>CODE_COVERAGE</metric>
-            <healthy><%= @coverage['code']['healthy'] %></healthy>
-            <unhealthy><%= @coverage['code']['unhealthy'] %></unhealthy>
-            <unstable><%= @coverage['code']['unstable'] %></unstable>
-          </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
-        </targets>
-      </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-    <% end %>
-    <% if @rails_report %>
-      <hudson.plugins.rubyMetrics.railsNotes.RailsNotesPublisher plugin="rubyMetrics@1.6.2">
-        <rake plugin="rake@1.8.0">
-          <rakeInstallation>(Default)</rakeInstallation>
-          <rakeWorkingDir></rakeWorkingDir>
-          <tasks>notes</tasks>
-          <silent>true</silent>
-          <bundleExec>true</bundleExec>
-        </rake>
-        <rakeInstallation>(Default)</rakeInstallation>
+  <% end %>
+  <% if @lang == :ruby && (@metric_fu_report || @coverage) %>
+    <htmlpublisher.HtmlPublisher plugin="htmlpublisher@1.3">
+      <reportTargets>
+      <% if @metric_fu_report %>
+        <htmlpublisher.HtmlPublisherTarget>
+          <reportName>Metric Fu Report</reportName>
+          <reportDir>tmp/metric_fu/output/</reportDir>
+          <reportFiles>index.html</reportFiles>
+          <keepAll>true</keepAll>
+          <allowMissing>true</allowMissing>
+          <wrapperName>htmlpublisher-wrapper.html</wrapperName>
+        </htmlpublisher.HtmlPublisherTarget>
+      <% end %>
+      <% if @coverage %>
+        <htmlpublisher.HtmlPublisherTarget>
+          <reportName>Simplecov Report</reportName>
+          <reportDir>coverage/</reportDir>
+          <reportFiles>index.html</reportFiles>
+          <keepAll>true</keepAll>
+          <allowMissing>true</allowMissing>
+          <wrapperName>htmlpublisher-wrapper.html</wrapperName>
+        </htmlpublisher.HtmlPublisherTarget>
+      <% end %>
+      </reportTargets>
+    </htmlpublisher.HtmlPublisher>
+  <% end %>
+  <% if @lang == :ruby && @rubocop %>
+    <hudson.plugins.violations.ViolationsPublisher plugin="violations@0.7.11">
+      <config>
+        <suppressions class="sorted-set"/>
+        <typeConfigs>
+          <entry>
+            <string>checkstyle</string>
+            <hudson.plugins.violations.TypeConfig>
+              <type>checkstyle</type>
+              <min><%= @rubocop['min'] -%></min>
+              <max><%= @rubocop['max'] -%></max>
+              <unstable><%= @rubocop['unstable'] -%></unstable>
+              <usePattern>false</usePattern>
+              <pattern>checkstyle.xml</pattern>
+            </hudson.plugins.violations.TypeConfig>
+          </entry>
+        </typeConfigs>
+        <limit>100</limit>
+        <sourcePathPattern></sourcePathPattern>
+        <fauxProjectPath></fauxProjectPath>
+        <encoding>default</encoding>
+      </config>
+    </hudson.plugins.violations.ViolationsPublisher>
+  <% end %>
+  <% if @lang == :java && (@pmd || @findbugs || @checkstyle) %>
+    <hudson.plugins.violations.ViolationsPublisher plugin="violations@0.7.11">
+      <config>
+        <suppressions class="sorted-set"/>
+        <typeConfigs>
+        <% if @checkstyle %>
+          <entry>
+            <string>checkstyle</string>
+            <hudson.plugins.violations.TypeConfig>
+              <type>checkstyle</type>
+              <min><%= @checkstyle['min'] -%></min>
+              <max><%= @checkstyle['max'] -%></max>
+              <unstable><%= @checkstyle['unstable'] -%></unstable>
+              <usePattern>false</usePattern>
+              <pattern>build/reports/checkstyle/*.xml</pattern>
+            </hudson.plugins.violations.TypeConfig>
+          </entry>
+        <% end %>
+
+        <% if @findbugs %>
+          <entry>
+            <string>findbugs</string>
+            <hudson.plugins.violations.TypeConfig>
+              <type>findbugs</type>
+              <min><%= @findbugs['min'] -%></min>
+              <max><%= @findbugs['max'] -%></max>
+              <unstable><%= @findbugs['unstable'] -%></unstable>
+              <usePattern>false</usePattern>
+              <pattern>build/reports/findbugs/*.xml</pattern>
+            </hudson.plugins.violations.TypeConfig>
+          </entry>
+        <% end %>
+        <% if @pmd %>
+          <entry>
+            <string>pmd</string>
+            <hudson.plugins.violations.TypeConfig>
+              <type>pmd</type>
+              <min><%= @pmd['min'] -%></min>
+              <max><%= @pmd['max'] -%></max>
+              <unstable><%= @pmd['unstable'] -%></unstable>
+              <usePattern>false</usePattern>
+              <pattern>build/reports/pmd/*.xml</pattern>
+            </hudson.plugins.violations.TypeConfig>
+          </entry>
+        <% end %>
+        </typeConfigs>
+        <limit>100</limit>
+        <sourcePathPattern></sourcePathPattern>
+        <fauxProjectPath></fauxProjectPath>
+        <encoding>default</encoding>
+      </config>
+    </hudson.plugins.violations.ViolationsPublisher>
+  <% end %>
+  <% if @lang == :ruby && @coverage %>
+    <hudson.plugins.rubyMetrics.rcov.RcovPublisher plugin="rubyMetrics@1.5.0">
+      <reportDir>coverage/rcov/</reportDir>
+      <targets>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>TOTAL_COVERAGE</metric>
+          <healthy><%= @coverage['total']['healthy'] %></healthy>
+          <unhealthy><%= @coverage['total']['unhealthy'] %></unhealthy>
+          <unstable><%= @coverage['total']['unstable'] %></unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>CODE_COVERAGE</metric>
+          <healthy><%= @coverage['code']['healthy'] %></healthy>
+          <unhealthy><%= @coverage['code']['unhealthy'] %></unhealthy>
+          <unstable><%= @coverage['code']['unstable'] %></unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+      </targets>
+    </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+  <% end %>
+  <% if @lang == :ruby && @rails_report %>
+    <hudson.plugins.rubyMetrics.railsNotes.RailsNotesPublisher plugin="rubyMetrics@1.6.2">
+      <rake plugin="rake@1.8.0">
+        <rakeInstallation>ruby-<%= @ruby_version -%>@<%= @ruby_gemset -%></rakeInstallation>
         <rakeWorkingDir></rakeWorkingDir>
-        <task>notes</task>
-      </hudson.plugins.rubyMetrics.railsNotes.RailsNotesPublisher>
-      <hudson.plugins.rubyMetrics.railsStats.RailsStatsPublisher plugin="rubyMetrics@1.6.2">
-        <rake plugin="rake@1.8.0">
-          <rakeInstallation>(Default)</rakeInstallation>
-          <rakeWorkingDir></rakeWorkingDir>
-          <tasks>stats</tasks>
-          <silent>true</silent>
-          <bundleExec>true</bundleExec>
-        </rake>
-        <rakeInstallation>(Default)</rakeInstallation>
+        <tasks>notes</tasks>
+        <silent>true</silent>
+        <bundleExec>true</bundleExec>
+      </rake>
+      <rakeInstallation>ruby-<%= @ruby_version -%>@<%= @ruby_gemset -%></rakeInstallation>
+      <rakeWorkingDir></rakeWorkingDir>
+      <task>notes</task>
+    </hudson.plugins.rubyMetrics.railsNotes.RailsNotesPublisher>
+    <hudson.plugins.rubyMetrics.railsStats.RailsStatsPublisher plugin="rubyMetrics@1.6.2">
+      <rake plugin="rake@1.8.0">
+        <rakeInstallation>ruby-<%= @ruby_version -%>@<%= @ruby_gemset -%></rakeInstallation>
         <rakeWorkingDir></rakeWorkingDir>
-        <task>stats</task>
-      </hudson.plugins.rubyMetrics.railsStats.RailsStatsPublisher>
-    <% end %>
+        <tasks>stats</tasks>
+        <silent>true</silent>
+        <bundleExec>true</bundleExec>
+      </rake>
+      <rakeInstallation>ruby-<%= @ruby_version -%>@<%= @ruby_gemset -%></rakeInstallation>
+      <rakeWorkingDir></rakeWorkingDir>
+      <task>stats</task>
+    </hudson.plugins.rubyMetrics.railsStats.RailsStatsPublisher>
+  <% end %>
     <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.37.2.2">
       <recipientList>$DEFAULT_RECIPIENTS</recipientList>
       <configuredTriggers>
@@ -296,44 +404,43 @@ bundle exec brakeman -o brakeman-output.tabs
     </hudson.plugins.emailext.ExtendedEmailPublisher>
   </publishers>
   <buildWrappers>
-    <% if @ws_cleanup %>
-      <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.23">
-        <deleteDirs>false</deleteDirs>
-        <cleanupParameter></cleanupParameter>
-        <externalDelete></externalDelete>
-      </hudson.plugins.ws__cleanup.PreBuildCleanup>
-    <% end %>
+  <% if @ws_cleanup %>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.23">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  <% end %>
     <EnvInjectBuildWrapper plugin="envinject@1.90">
       <info>
         <propertiesContent>
-JOB_NAME=<%= @job_name %>
+RVM_HOME=<%= node['jenkins']['master']['home'] -%>/.rvm
+PROJECT_NAME=<%= @project_name %>
 BRANCH=<%= @branch_file_name %>
+JOB_SUFFIX=_${BRANCH}_${EXECUTOR_NUMBER}
+<% if @lang == :ruby %>
 RUBY_VERSION=<%= @ruby_version %>
 RUBY_GEMSET=<%= @ruby_gemset %>
+<% end %>
 <%= 'COVERAGE=1' if @coverage %>
+<% @env_inject.each do |env| %>
+<%= env %>
+<% end %>
         </propertiesContent>
+        <scriptContent>
+        </scriptContent>
         <loadFilesFromMaster>false</loadFilesFromMaster>
       </info>
     </EnvInjectBuildWrapper>
-    <ruby-proxy-object>
-      <ruby-object ruby-class="Jenkins::Plugin::Proxies::BuildWrapper" pluginid="rvm">
-        <pluginid pluginid="rvm" ruby-class="String">rvm</pluginid>
-        <object ruby-class="RvmWrapper" pluginid="rvm">
-          <impl pluginid="rvm" ruby-class="String">${RUBY_VERSION}@${RUBY_GEMSET}</impl>
-        </object>
-      </ruby-object>
-    </ruby-proxy-object>
     <% unless (defined? @key_id).nil? %>
-      <com.cloudbees.jenkins.plugins.sshagent.SSHAgentBuildWrapper plugin="ssh-agent@1.4.1">
-        <user><%= @key_id %></user>
-      </com.cloudbees.jenkins.plugins.sshagent.SSHAgentBuildWrapper>
+    <com.cloudbees.jenkins.plugins.sshagent.SSHAgentBuildWrapper plugin="ssh-agent@1.4.1">
+      <user><%= @key_id %></user>
+    </com.cloudbees.jenkins.plugins.sshagent.SSHAgentBuildWrapper>
     <% end %>
   </buildWrappers>
-  <% if @type == :ruby_matrix %>
-    <% if @matrix['sequentially'] %>
-      <executionStrategy class="hudson.matrix.DefaultMatrixExecutionStrategyImpl">
-        <runSequentially>true</runSequentially>
-      </executionStrategy>
-    <% end %>
+  <% if @type_tag == 'matrix-project' && @matrix['sequentially']%>
+  <executionStrategy class="hudson.matrix.DefaultMatrixExecutionStrategyImpl">
+    <runSequentially>true</runSequentially>
+  </executionStrategy>
   <% end %>
 </<%= @type_tag -%>>

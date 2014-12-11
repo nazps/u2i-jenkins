@@ -1,4 +1,5 @@
 require 'securerandom'
+require 'active_support/core_ext'
 
 def whyrun_supported?
   true
@@ -25,24 +26,45 @@ action :delete do
 end
 
 def load_current_resource
-  if @new_resource.type == :ruby_matrix
+  if @new_resource.type == :matrix
     if !defined?(@new_resource.matrix) || @new_resource.matrix.nil?
-      fail 'Missing matrix attribute for ruby_matrix project'
+      fail 'Missing matrix attribute for matrix project'
     end
   end
   @current_resource = Chef::Resource::U2iJenkinsJob.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
+  @current_resource.lang(@new_resource.lang)
   @current_resource.rubocop(node['u2i-jenkins']['config']['plugins']['rubocop']['default'].deep_merge(@new_resource.rubocop))
-  @current_resource.coverage(node['u2i-jenkins']['config']['plugins']['coverage']['default'].deep_merge(@new_resource.coverage))
+  if @new_resource.coverage
+    @current_resource.coverage(node['u2i-jenkins']['config']['plugins']['coverage']['default'].deep_merge(@new_resource.coverage))
+  else
+    @current_resource.coverage(false)
+  end
+
+  if @new_resource.lang == :ruby
+    @current_resource.checkstyle(false)
+    @current_resource.pmd(false)
+    @current_resource.findbugs(false)
+  elsif @new_resource.lang == :java
+    @current_resource.rubocop(false)
+    @current_resource.metric_fu(false)
+    @current_resource.brakeman(false)
+    @current_resource.rails(false)
+    @current_resource.custom_db(false)
+    @current_resource.rails_adapter(nil)
+  end
 end
 
 private
 
 def create_job(branch)
   if new_resource.key
-    credentials = jenkins_private_key_credentials new_resource.name do
-      description ''
-      private_key new_resource.key
+    h = new_resource.key.dup
+    credential_name, credential_config = h.keys.first, h[h.keys.first]
+    credentials = jenkins_private_key_credentials credential_name.dup do
+      description credential_config['description'].dup if credential_name['description']
+      private_key credential_config['private_key'].dup
+      id credential_config['id'].dup
     end
     credentials_id = credentials.id
   elsif new_resource.key_id
@@ -52,23 +74,54 @@ def create_job(branch)
   end
 
   type_tag = case @new_resource.type
-               when :ruby
+               when :freestyle
                  'project'
-               when :ruby_matrix
+               when :matrix
                  'matrix-project'
              end
 
   branch_file_name = branch.gsub('/', ':')
   config = ::File.join(Chef::Config[:file_cache_path], "#{new_resource.name}_#{branch_file_name}.config.xml")
 
+  builders = new_resource.builders
+
+  if @new_resource.lang == :ruby
+    rvm_setup = "set +x\nsource $RVM_HOME/scripts/rvm\nrvm use ${RUBY_VERSION}@${RUBY_GEMSET} --create --install\nset -x"
+
+    builders = builders.map do |builder|
+      if builder.key?('hudson.tasks.Shell')
+        {
+          'hudson.tasks.Shell' => {
+            'command' => [rvm_setup, builder['hudson.tasks.Shell']['command']].join("\n")
+          }
+        }
+      else
+        builder
+      end
+    end
+  end
+
+  builders = builders.flat_map do |builder|
+    builder.map do |k, v|
+      v.to_xml(root: k, skip_instruct: true).split("\n").map do |l|
+        (l.start_with?('<') ? '    ' : '') + l
+      end.join("\n")
+    end
+  end
+
   template config do
     source 'jenkins/job.config.xml.erb'
-    variables job_name: new_resource.name,
+    variables project_name: new_resource.name,
               repository: new_resource.repository,
               branch: branch,
-              builders: new_resource.builders,
+              builders: builders,
+              concurrent_build: new_resource.concurrent_build,
 
+              description: new_resource.description,
+
+              timer_trigger: new_resource.timer_trigger,
               type: new_resource.type,
+              lang: new_resource.lang,
               matrix: new_resource.matrix,
               ws_cleanup: new_resource.ws_cleanup,
               keep_builds: new_resource.keep_builds,
@@ -85,11 +138,18 @@ def create_job(branch)
               brakeman_report: new_resource.brakeman,
               rails_report: new_resource.rails,
 
+              env_inject: new_resource.env_inject,
+
+              checkstyle: new_resource.checkstyle,
+              pmd: new_resource.pmd,
+              findbugs: new_resource.findbugs,
+
               key_id: credentials_id,
 
               is_pull_request: (branch == 'pr'),
               type_tag: type_tag,
               branch_file_name: branch_file_name
+    cookbook 'u2i-jenkins'
   end
 
   jenkins_job "\(#{branch}\)\ #{new_resource.name}" do
@@ -106,12 +166,14 @@ def create_job(branch)
       recursive true
     end
 
-    file ::File.join(dev_path, 'config', branch, 'database.yml') do
-      content(database_yaml(new_resource.name, branch))
-      owner 'jenkins'
-      group 'jenkins'
-      mode 0644
-      action :create
+    unless new_resource.custom_db
+      file ::File.join(dev_path, 'config', 'database.yml') do
+        content(database_yaml(new_resource.rails_adapter))
+        owner 'jenkins'
+        group 'jenkins'
+        mode 0644
+        action :create
+      end
     end
   end
 end

@@ -7,6 +7,7 @@ if node['jenkins']['master']['install_method'] == 'war'
 end
 
 include_recipe 'jenkins::master'
+include_recipe 'maven'
 include_recipe 'u2i-jenkins::_plugins'
 
 group 'rvm' do
@@ -25,8 +26,10 @@ configs = %w(
   hudson.plugins.git.GitSCM.xml
   hudson.plugins.git.GitTool.xml
   hudson.tasks.Mailer.xml
+  hudson.tasks.Shell.xml
   jenkins.model.JenkinsLocationConfiguration.xml
   hudson.plugins.emailext.ExtendedEmailPublisher.xml
+  hudson.tasks.Maven.xml
 )
 
 configs.each do |config|
@@ -56,3 +59,7 @@ template github_config do
   variables access_token: keys['GitHubPushTrigger']['accessToken'],
             admins: keys['GitHubPushTrigger']['admins'].join(', ')
 end
+
+include_recipe 'u2i-jenkins::_proxy'
+
+chef_gem 'activesupport'
