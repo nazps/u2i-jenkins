@@ -8,6 +8,13 @@ home = node['jenkins']['master']['home']
 keys = Chef::EncryptedDataBagItem.load('keys', 'jenkins')
 user = 'chef'
 
+directory File.join(home, '.ssh') do
+  owner 'jenkins'
+  group 'jenkins'
+  mode '0744'
+  action :create
+end
+
 file File.join(home, '.ssh', "#{user}.id_rsa") do
   content keys['users'][user]['private_key']
   user 'jenkins'
