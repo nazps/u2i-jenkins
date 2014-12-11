@@ -35,6 +35,7 @@ suites:
         master:
           port: 8080
       u2i-jenkins:
+        user: vagrant
         config:
           gitconfig:
             name: Jenkins
