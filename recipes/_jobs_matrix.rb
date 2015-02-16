@@ -25,7 +25,7 @@ branches.each do |branch|
               combination_filter: node['u2i-jenkins']['jobs'][job_name]['matrix']['combination_filter']
   end
 
-  jenkins_job "\(#{branch}\)\ #{job_name}" do
-    config config
-  end
+  # jenkins_job "\(#{branch}\)\ #{job_name}" do
+  #   config config
+  # end
 end
