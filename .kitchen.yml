@@ -28,7 +28,7 @@ suites:
     run_list:
       - recipe[u2i-jenkins]
       - recipe[u2i-jenkins::jobs]
-      - recipe[u2i-jenkins::auth]
+#      - recipe[u2i-jenkins::auth]
     attributes:
       jenkins:
         executor:
