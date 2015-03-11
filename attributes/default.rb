@@ -16,10 +16,10 @@ default['u2i-jenkins']['config']['views'] = {
   },
   'CategorizedJobsView' => {
     'categorized' => {
-      'includeRegex' => '\((?!pr)\w+\)\ .+',
+      'includeRegex' => '\((?!pr)[\.\w]+\)\ .+',
       'categorizationCriteria' => node['u2i-jenkins']['jobs'].map do |jobname, _|
         {
-          'groupRegex' => "\\((?!pr)\\w+\\)\\ #{jobname}",
+          'groupRegex' => "\\((?!pr)[\\.\\w]+\\)\\ #{jobname}",
           'namingRule' => jobname
         }
       end
@@ -31,6 +31,7 @@ default['u2i-jenkins']['config']['views'] = {
     }
   }
 }
+
 default['u2i-jenkins']['config']['primaryView'] = 'categorized'
 
 default['u2i-jenkins']['config']['address'] = node['u2i-jenkins']['config']['domain']
