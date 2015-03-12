@@ -79,6 +79,8 @@ attribute :brakeman,      kind_of: [TrueClass, FalseClass], default: false
 attribute :rails,         kind_of: [TrueClass, FalseClass], default: false
 attribute :custom_db,     kind_of: [TrueClass, FalseClass], default: false
 attribute :rails_adapter, kind_of: [String, NilClass],      default: 'mysql2',                         callbacks: callbacks[:rails_adapter]
+attribute :gemnasium_token, kind_of: [String, NilClass]
+attribute :gemnasium_project_slugs, kind_of: Hash,         default: {}
 
 attribute :env_inject,    kind_of: Array,                   default: []
 
