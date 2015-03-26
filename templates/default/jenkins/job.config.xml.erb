@@ -117,7 +117,7 @@
       <command>
 set +x
 source $RVM_HOME/scripts/rvm
-rvm use ${RUBY_VERSION}@${RUBY_GEMSET} --create --install
+rvm use ${JOB_RUBY_VERSION}@${JOB_RUBY_GEMSET} --create --install
 export RUBY_VERSION_CURRENT=`rvm current`
 set -x
 
@@ -133,7 +133,7 @@ fi;
       <command>
 set +x
 source $RVM_HOME/scripts/rvm
-rvm use ${RUBY_VERSION}@${RUBY_GEMSET} --create --install
+rvm use ${JOB_RUBY_VERSION}@${JOB_RUBY_GEMSET} --create --install
 set -x
 
 echo "Run Metric Fu"
@@ -146,7 +146,7 @@ bundle exec metric_fu
       <command>
 set +x
 source $RVM_HOME/scripts/rvm
-rvm use ${RUBY_VERSION}@${RUBY_GEMSET} --create --install
+rvm use ${JOB_RUBY_VERSION}@${JOB_RUBY_GEMSET} --create --install
 set -x
 
 echo "Run brakeman"
@@ -419,8 +419,8 @@ PROJECT_NAME=<%= @project_name %>
 BRANCH=<%= @branch_file_name %>
 JOB_SUFFIX=_${BRANCH}_${EXECUTOR_NUMBER}
 <% if @lang == :ruby %>
-RUBY_VERSION=<%= @ruby_version %>
-RUBY_GEMSET=<%= @ruby_gemset %>
+JOB_RUBY_VERSION=<%= @ruby_version %>
+JOB_RUBY_GEMSET=<%= @ruby_gemset %>
 <% end %>
 <%= 'COVERAGE=1' if @coverage %>
 <% @env_inject.each do |env| %>

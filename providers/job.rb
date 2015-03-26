@@ -86,7 +86,7 @@ def create_job(branch)
   builders = new_resource.builders
 
   if @new_resource.lang == :ruby
-    rvm_setup = "set +x\nsource $RVM_HOME/scripts/rvm\nrvm use ${RUBY_VERSION}@${RUBY_GEMSET} --create --install\nset -x"
+    rvm_setup = "set +x\nsource $RVM_HOME/scripts/rvm\nrvm use ${JOB_RUBY_VERSION}@${JOB_RUBY_GEMSET} --create --install\nset -x"
 
     builders = builders.map do |builder|
       if builder.key?('hudson.tasks.Shell')

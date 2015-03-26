@@ -61,9 +61,9 @@ suites:
             - pr
             matrix:
               sequentially: true
-              combination_filter: "!(RUBY_VERSION==&quot;1.8.7&quot; &amp;&amp; RAILS_VERSION==&quot;4&quot;)"
+              combination_filter: "!(JOB_RUBY_VERSION==&quot;1.8.7&quot; &amp;&amp; RAILS_VERSION==&quot;4&quot;)"
               axes:
-                RUBY_VERSION:
+                JOB_RUBY_VERSION:
                 - 1.9.3-p547
                 - 2.1.5
                 RAILS_VERSION:
