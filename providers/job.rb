@@ -137,6 +137,8 @@ def create_job(branch)
               metric_fu: new_resource.metric_fu,
               brakeman_report: new_resource.brakeman,
               rails_report: new_resource.rails,
+              gemnasium_token: new_resource.gemnasium_token,
+              gemnasium_project_slug: new_resource.gemnasium_project_slugs[branch],
 
               env_inject: new_resource.env_inject,
 
