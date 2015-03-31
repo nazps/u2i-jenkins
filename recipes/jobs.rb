@@ -31,6 +31,11 @@ node['u2i-jenkins']['jobs'].each do |jobname, config|
       rails_adapter config['rails_adapter'] unless config['rails_adapter']
       custom_db config['custom_db'] unless config['custom_db'].nil?
 
+      unless keys['Gemnasium'].nil?
+        gemnasium_token keys['Gemnasium']['accessToken']
+        gemnasium_project_slugs keys['Gemnasium']['projectSlugs'][jobname]
+      end
+
       env_inject config['env_inject'] unless config['env_inject'].nil?
 
       key({credential_name => keys['credentials'][credential_name]})

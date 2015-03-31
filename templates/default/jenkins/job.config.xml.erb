@@ -112,6 +112,14 @@
   <% @builders.each do |builder| %>
 <%= builder %>
   <% end %>
+  <% unless @gemnasium_project_slug.nil? %>
+    <hudson.tasks.Shell>
+      <command>
+gemnasium configure ${GEMNASIUM_PROJECT_SLUG}
+gemnasium dependency_files push -f=Gemfile,Gemfile.lock
+      </command>
+    </hudson.tasks.Shell>
+  <% end %>
   <% if @lang == :ruby && @rubocop %>
     <hudson.tasks.Shell>
       <command>
@@ -423,6 +431,8 @@ JOB_RUBY_VERSION=<%= @ruby_version %>
 JOB_RUBY_GEMSET=<%= @ruby_gemset %>
 <% end %>
 <%= 'COVERAGE=1' if @coverage %>
+<%= "GEMNASIUM_TOKEN=#{@gemnasium_token}" unless @gemnasium_token.nil? %>
+<%= "GEMNASIUM_PROJECT_SLUG=#{@gemnasium_project_slug}" unless @gemnasium_project_slug.nil? %>
 <% @env_inject.each do |env| %>
 <%= env %>
 <% end %>
