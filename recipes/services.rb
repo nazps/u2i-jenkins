@@ -1,7 +1,7 @@
+package 'mysql-client-5.6'
+package 'libmysqlclient-dev'
 include_recipe 'apt'
 include_recipe 'mysql::server'
-include_recipe 'mysql::client'
-include_recipe 'database::mysql'
 
 apt_repository 'gemnasium' do
   uri          'http://apt.gemnasium.com'
