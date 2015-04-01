@@ -1,5 +1,4 @@
 package 'mysql-client-5.6'
-package 'libmysqlclient-dev'
 include_recipe 'apt'
 include_recipe 'mysql::server'
 
