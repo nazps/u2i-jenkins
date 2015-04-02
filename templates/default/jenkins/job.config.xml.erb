@@ -35,6 +35,9 @@
         <refspec>+refs/pull/*:refs/remotes/origin/pr/*</refspec>
       <% end %>
         <url>git@github.com:<%= @repository -%>.git</url>
+        <% unless (defined? @key_id).nil? %>
+        <credentialsId><%= @key_id %></credentialsId>
+        <% end %>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
