@@ -1,8 +1,8 @@
 def database_yaml(rails_adapter = 'mysql2')
   common = {
     'host' => 'localhost',
-    'username' => 'root',
-    'password' => node['mysql']['server_root_password'],
+    'username' => node['u2i-jenkins']['mysql']['username'],
+    'password' => node['u2i-jenkins']['mysql']['password'],
     'adapter' => rails_adapter,
     'timeout' => 5000,
     'encoding' => 'utf8',

@@ -1,8 +1,6 @@
 override['jenkins']['master']['port'] = 8080
 
 default['u2i-jenkins']['projects_dir'] = '/var/proj'
-default['mysql']['server_root_password'] = 'jenkins'
-default['mysql']['version'] = '5.6'
 
 default['u2i-jenkins']['jobs'] = {}
 

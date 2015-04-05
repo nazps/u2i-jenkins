@@ -1,6 +1,4 @@
-package 'mysql-client-5.6'
 include_recipe 'apt'
-include_recipe 'mysql::server'
 
 apt_repository 'gemnasium' do
   uri          'http://apt.gemnasium.com'
