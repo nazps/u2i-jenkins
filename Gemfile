@@ -11,7 +11,7 @@ group :development do
   gem 'pry'
 end
 
-gem 'chef', '~> 11.16.4'
+gem 'chef', '~> 11.18.0'
 gem 'berkshelf'
 gem 'knife-solo_data_bag'
 gem 'test-kitchen'
