@@ -41,6 +41,8 @@ end
 
 permissions = []
 
+permissions << 'hudson.model.Item.ViewStatus:anonymous'
+
 permissions += (node['u2i-jenkins']['config']['users']['guests']).flat_map do |user|
   %W(hudson.model.Hudson.Read:#{user}
      hudson.model.Item.Read:#{user}

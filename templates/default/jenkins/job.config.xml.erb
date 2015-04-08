@@ -134,7 +134,11 @@ set -x
 
 if ! [[ &quot;$RUBY_VERSION_CURRENT&quot; &lt; &quot;ruby-1.9&quot; ]]; then
   echo &quot;Generate Rubocop metrics&quot;
-  bundle exec rubocop --fail-level error --require rubocop/formatter/checkstyle_formatter --format RuboCop::Formatter::CheckstyleFormatter --no-color --out checkstyle.xml
+  bundle exec rubocop --fail-level error \
+    --require rubocop/formatter/checkstyle_formatter \
+    --format RuboCop::Formatter::CheckstyleFormatter \
+    --no-color \
+    --out checkstyle.xml
 fi;
       </command>
     </hudson.tasks.Shell>
