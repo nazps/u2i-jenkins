@@ -1,6 +1,6 @@
 def database_yaml(rails_adapter = 'mysql2')
   common = {
-    'host' => 'localhost',
+    'host' => '127.0.0.1',
     'username' => node['u2i-jenkins']['mysql']['username'],
     'password' => node['u2i-jenkins']['mysql']['password'],
     'adapter' => rails_adapter,
