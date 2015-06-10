@@ -84,7 +84,7 @@ def create_job(branch)
                  'matrix-project'
              end
 
-  branch_file_name = branch.gsub('/', ':')
+  branch_file_name = branch.gsub('/', '__')
   config = ::File.join(Chef::Config[:file_cache_path], "#{new_resource.name}_#{branch_file_name}.config.xml")
 
   builders = new_resource.builders
