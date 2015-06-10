@@ -57,6 +57,10 @@ end
 
 private
 
+def escape_slash(branch)
+  branch.gsub('/', '_')
+end
+
 def create_job(branch)
   if new_resource.key
     h = new_resource.key.dup
@@ -154,7 +158,7 @@ def create_job(branch)
     cookbook 'u2i-jenkins'
   end
 
-  jenkins_job "\(#{branch}\)\ #{new_resource.name}" do
+  jenkins_job "\(#{escape_slash(branch)}\)\ #{new_resource.name}" do
     config config
   end
 
@@ -181,7 +185,7 @@ def create_job(branch)
 end
 
 def delete_job(branch)
-  jenkins_job "\(#{branch}\)\ #{new_resource.name}" do
+  jenkins_job "\(#{escape_slash(branch)}\)\ #{new_resource.name}" do
     action :delete
   end
 end
