@@ -35,6 +35,7 @@ node['u2i-jenkins']['jobs'].each do |jobname, config|
         gemnasium_token keys['Gemnasium']['accessToken']
         gemnasium_project_slugs keys['Gemnasium']['projectSlugs'][jobname]
       end
+      github_token keys['Github']['access_token'] unless keys['Github'].nil?
 
       env_inject config['env_inject'] unless config['env_inject'].nil?
 

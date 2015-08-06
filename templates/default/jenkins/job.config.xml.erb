@@ -133,12 +133,15 @@ export RUBY_VERSION_CURRENT=`rvm current`
 set -x
 
 if ! [[ &quot;$RUBY_VERSION_CURRENT&quot; &lt; &quot;ruby-1.9&quot; ]]; then
+  <% if @is_pull_request %>
+  echo &quot;Send pronto comments&quot;
+  git fetch
+  bundle exec rake ns:pronto:pr[origin/${ghprbTargetBranch}]
+  <% else %>
   echo &quot;Generate Rubocop metrics&quot;
-  bundle exec rubocop --fail-level error \
-    --require rubocop/formatter/checkstyle_formatter \
-    --format RuboCop::Formatter::CheckstyleFormatter \
-    --no-color \
-    --out checkstyle.xml
+  bundle exec rake ci:rubocop
+  <% end %>
+
 fi;
       </command>
     </hudson.tasks.Shell>
@@ -440,6 +443,10 @@ JOB_RUBY_GEMSET=<%= @ruby_gemset %>
 <%= 'COVERAGE=1' if @coverage %>
 <%= "GEMNASIUM_TOKEN=#{@gemnasium_token}" unless @gemnasium_token.nil? %>
 <%= "GEMNASIUM_PROJECT_SLUG=#{@gemnasium_project_slug}" unless @gemnasium_project_slug.nil? %>
+<% if @is_pull_request %>
+GITHUB_ACCESS_TOKEN=<%= @github_token %>
+PULL_REQUEST_ID=${ghprbPullId}
+<% end %>
 <% @env_inject.each do |env| %>
 <%= env %>
 <% end %>

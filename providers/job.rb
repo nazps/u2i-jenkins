@@ -143,6 +143,7 @@ def create_job(branch)
               rails_report: new_resource.rails,
               gemnasium_token: new_resource.gemnasium_token,
               gemnasium_project_slug: new_resource.gemnasium_project_slugs[branch],
+              github_token: new_resource.github_token,
 
               env_inject: new_resource.env_inject,
 
