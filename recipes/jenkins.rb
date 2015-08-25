@@ -22,7 +22,6 @@ ssh_known_hosts_entry 'github.com'
 
 configs = %w(
   .gitconfig
-  config.xml
   hudson.plugins.git.GitSCM.xml
   hudson.plugins.git.GitTool.xml
   hudson.tasks.Mailer.xml
@@ -31,6 +30,12 @@ configs = %w(
   hudson.plugins.emailext.ExtendedEmailPublisher.xml
   hudson.tasks.Maven.xml
 )
+template File.join(home, 'config.xml') do
+  source 'jenkins/config.xml.erb'
+  owner 'jenkins'
+  group 'jenkins'
+  action :create_if_missing
+end
 
 configs.each do |config|
   template File.join(home, config) do
