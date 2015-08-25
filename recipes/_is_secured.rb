@@ -17,8 +17,11 @@ ruby_block 'set jenkins_private_key' do
 
       unsecured_regex = /<authorizationStrategy\s+class=".+Unsecured"\s*\/>/
 
-      unless config.match(unsecured_regex)
-        pp '$$$ secured'
+      if config.match(unsecured_regex)
+        puts '$$$ Jenkins is unsecured'
+        node.run_state[:jenkins_private_key] = nil
+      else
+        puts '$$$ Jenkins is secured'
         node.run_state[:jenkins_private_key] = keys['users'][user]['private_key']
       end
     end
