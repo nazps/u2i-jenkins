@@ -4,7 +4,7 @@ maintainer_email 'michal.knapik@u2i.com'
 license          'All rights reserved'
 description      'Installs/Configures u2i-jenkins'
 long_description 'Installs/Configures u2i-jenkins'
-version          '0.7.2'
+version          '0.7.3'
 
 depends 'java', '~> 1.29.0'
 depends 'apache2', '~> 2.0.0'
