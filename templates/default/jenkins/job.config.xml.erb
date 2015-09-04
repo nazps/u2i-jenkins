@@ -134,7 +134,7 @@ set -x
 
 if ! [[ &quot;$RUBY_VERSION_CURRENT&quot; &lt; &quot;ruby-1.9&quot; ]]; then
   <% if @is_pull_request %>
-  set -e
+  set +e
   echo &quot;Send pronto comments&quot;
   git fetch
   bundle exec rake ns:pronto:pr[origin/${ghprbTargetBranch}]
