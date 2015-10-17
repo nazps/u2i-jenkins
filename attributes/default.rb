@@ -82,3 +82,7 @@ default['u2i-jenkins']['config']['plugins']['google-login']['clientSecret'] = ''
 default['u2i-jenkins']['config']['plugins']['google-login']['domain'] = 'u2i.com'
 
 force_override['apache']['listen_ports'] = ['80']
+
+default['java']['install_flavor'] = 'oracle'
+default['java']['jdk_version'] = '8'
+default['java']['oracle']['accept_oracle_download_terms'] = true

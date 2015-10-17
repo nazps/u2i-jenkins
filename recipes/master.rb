@@ -1,0 +1,6 @@
+include_recipe 'u2i-jenkins::_is_secured'
+include_recipe 'u2i-jenkins::_jenkins'
+# include_recipe 'u2i-jenkins::_slaves'
+include_recipe 'u2i-jenkins::_services'
+include_recipe 'u2i-jenkins::_rvm'
+include_recipe 'u2i-jenkins::_service_restart'

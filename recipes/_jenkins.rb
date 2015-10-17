@@ -1,13 +1,7 @@
 home = node['jenkins']['master']['home']
 
-include_recipe 'apt'
-
-if node['jenkins']['master']['install_method'] == 'war'
-  include_recipe 'java::default'
-end
-
+include_recipe 'u2i-jenkins::_common'
 include_recipe 'jenkins::master'
-include_recipe 'maven'
 include_recipe 'u2i-jenkins::_plugins'
 
 group 'rvm' do
@@ -15,8 +9,6 @@ group 'rvm' do
   members %w(jenkins)
   append  true
 end
-
-ssh_known_hosts_entry 'github.com'
 
 ## Configs
 
@@ -66,5 +58,3 @@ template github_config do
 end
 
 include_recipe 'u2i-jenkins::_proxy'
-
-chef_gem 'activesupport'
