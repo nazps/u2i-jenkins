@@ -366,7 +366,7 @@ exit 0</script>
       </targets>
     </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
   <% end %>
-  <% if @lang == :ruby && @rails_report %>
+  <% if @lang == :ruby && @rails_report && @ruby_version < '2.2' %>
     <hudson.plugins.rubyMetrics.railsNotes.RailsNotesPublisher plugin="rubyMetrics@1.6.2">
       <rake plugin="rake@1.8.0">
         <rakeInstallation>ruby-<%= @ruby_version -%>@<%= @ruby_gemset -%></rakeInstallation>
