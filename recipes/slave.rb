@@ -2,21 +2,21 @@ include_recipe 'u2i-jenkins::_common'
 include_recipe 'u2i-jenkins::_services'
 
 # Create the Jenkins user
-user node['jenkins']['master']['user'] do
-  home node['jenkins']['master']['home']
-  system node['jenkins']['master']['use_system_accounts']
+user node['u2i-jenkins']['slave']['user'] do
+  home node['u2i-jenkins']['slave']['home']
+  system false
 end
 
 # Create the Jenkins group
-group node['jenkins']['master']['group'] do
-  members node['jenkins']['master']['user']
-  system node['jenkins']['master']['use_system_accounts']
+group node['u2i-jenkins']['slave']['group'] do
+  members node['u2i-jenkins']['slave']['user']
+  system false
 end
 
 # Create the home directory
-directory node['jenkins']['master']['home'] do
-  owner     node['jenkins']['master']['user']
-  group     node['jenkins']['master']['group']
+directory node['u2i-jenkins']['slave']['home'] do
+  owner     node['u2i-jenkins']['slave']['user']
+  group     node['u2i-jenkins']['slave']['group']
   mode      '0755'
   recursive true
 end
