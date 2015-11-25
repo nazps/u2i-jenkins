@@ -348,7 +348,14 @@ exit 0</script>
     </hudson.plugins.violations.ViolationsPublisher>
   <% end %>
   <% if @lang == :ruby && @coverage %>
-    <hudson.plugins.rubyMetrics.rcov.RcovPublisher plugin="rubyMetrics@1.5.0">
+<org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<condition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition" plugin="run-condition@1.0">
+<arg1>$JOB_RUBY_VERSION</arg1>
+<arg2>2.1.5</arg2>
+<ignoreCase>false</ignoreCase>
+</condition>
+<publisherList>
+ <hudson.plugins.rubyMetrics.rcov.RcovPublisher plugin="rubyMetrics@1.5.0">
       <reportDir>coverage/rcov/</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
@@ -365,6 +372,10 @@ exit 0</script>
         </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
       </targets>
     </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+</publisherList>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.0"/>
+<executionStrategy class="org.jenkins_ci.plugins.flexible_publish.strategy.FailAtEndExecutionStrategy"/>
+</org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
   <% end %>
   <% if @lang == :ruby && @rails_report && @ruby_version < '2.2' %>
     <hudson.plugins.rubyMetrics.railsNotes.RailsNotesPublisher plugin="rubyMetrics@1.6.2">
